@@ -13,6 +13,7 @@ namespace Enemy
     public class EnemyController : MonoBehaviour
     {
         public BaseState defaultState;
+        public List<EnemyStateEventListener> enemyStateEventListeners;
 
         [Header("References")]
         private Animator _animator;
@@ -56,6 +57,22 @@ namespace Enemy
             playerTarget = FieldOfView.currentTarget;
         }
 
+        private void OnEnable()
+        {
+            foreach (var listeners in enemyStateEventListeners)
+            {
+                listeners?.OnEnable();
+            }
+        }
+
+        private void OnDisable()
+        {
+            foreach (var listeners in enemyStateEventListeners)
+            {
+                listeners?.OnDisable();
+            }
+        }
+
         private void Update()
         {
             currentState?.OnUpdate(this);
@@ -77,7 +94,6 @@ namespace Enemy
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(this.transform.position, enemySettings.attackRange);
         }
-
         public bool IsPlayerInChaseRange() => Vector3.Distance(transform.position, playerTarget.position) <= enemySettings.chaseRange;
 
         public bool IsPlayerInAttackRange() => Vector3.Distance(transform.position, playerTarget.position) <= enemySettings.attackRange;
